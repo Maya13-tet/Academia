@@ -38,6 +38,20 @@ a{color:inherit}
 .btn.alt{background:var(--sky); color:var(--navy)}
 .btn.alt:hover{background:var(--sky2)}
 
+/* glow and wave on buttons */
+.btn,.seg button{position:relative; overflow:hidden; isolation:isolate}
+.btn.main{box-shadow:0 0 0 0 rgba(47,79,245,.55), 0 8px 24px -8px rgba(47,79,245,.6); animation:wave 2.6s ease-out infinite}
+.btn.main:hover,.btn.main:focus-visible{box-shadow:0 0 0 0 rgba(47,79,245,0), 0 0 28px 6px rgba(47,79,245,.55), 0 10px 30px -6px rgba(47,79,245,.8); animation:none}
+.btn.alt:hover,.btn.alt:focus-visible{box-shadow:0 0 24px 4px rgba(47,79,245,.35)}
+.seg button:hover,.seg button:focus-visible{box-shadow:0 0 18px 3px rgba(47,79,245,.35)}
+.seg button[aria-pressed="true"]{box-shadow:0 0 20px 3px rgba(47,79,245,.5)}
+.chan:hover b{box-shadow:0 0 24px 5px rgba(92,119,255,.7)}
+.chan b{transition:box-shadow .2s}
+@keyframes wave{0%{box-shadow:0 0 0 0 rgba(47,79,245,.55), 0 8px 24px -8px rgba(47,79,245,.6)} 70%,100%{box-shadow:0 0 0 18px rgba(47,79,245,0), 0 8px 24px -8px rgba(47,79,245,.6)}}
+.ripple{position:absolute; border-radius:50%; width:20px; height:20px; margin:-10px 0 0 -10px; background:rgba(255,255,255,.55); pointer-events:none; transform:scale(0); animation:ripple .7s ease-out forwards; z-index:-1}
+.btn.alt .ripple,.seg button:not([aria-pressed="true"]) .ripple{background:rgba(47,79,245,.3)}
+@keyframes ripple{to{transform:scale(18); opacity:0}}
+
 /* hero */
 .hero{background:radial-gradient(900px 500px at 85% 20%, var(--sky2), transparent 70%), var(--white); padding:32px 0 88px}
 .hero .grid{display:grid; grid-template-columns:1.1fr .9fr; gap:56px; align-items:center; padding-top:40px}
@@ -93,7 +107,7 @@ h2.big{font-weight:800; font-size:clamp(28px,4vw,44px); line-height:1.12; letter
 footer{padding:40px 0 56px; color:var(--muted); font-size:16px}
 footer .wrap{display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap}
 
-@media (prefers-reduced-motion:reduce){.dot::before{animation:none} .btn,.chan,.seg button{transition:none} html{scroll-behavior:auto}}
+@media (prefers-reduced-motion:reduce){.dot::before{animation:none} .btn.main{animation:none} .ripple{display:none} .btn,.chan,.seg button{transition:none} html{scroll-behavior:auto}}
 @media (max-width:860px){
   body{font-size:17px}
   .hero .grid,.steps,.channels,.about{grid-template-columns:1fr}
@@ -210,6 +224,16 @@ footer .wrap{display:flex; justify-content:space-between; gap:16px; flex-wrap:wr
 
 <script>
 (function(){
+  document.querySelectorAll('.btn,.seg button').forEach(function(el){
+    el.addEventListener('pointerdown',function(e){
+      var r=el.getBoundingClientRect(), s=document.createElement('span');
+      s.className='ripple';
+      s.style.left=(e.clientX-r.left)+'px';
+      s.style.top=(e.clientY-r.top)+'px';
+      el.appendChild(s);
+      s.addEventListener('animationend',function(){s.remove()});
+    });
+  });
   var out=document.getElementById('st');
   var btns=document.querySelectorAll('.seg button');
   btns.forEach(function(b){
